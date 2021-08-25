@@ -1,0 +1,46 @@
+<html>
+  <head>
+    <title>Chat</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.3/socket.io.js"></script>
+    <script
+      src="https://code.jquery.com/jquery-3.6.0.min.js"
+      integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
+    <section class="default-flex">
+      <form action="" method="post">
+        <label for="name">Nome</label>
+        <input type="text" name="name" id="name" />
+        <div class="messages"></div>
+        <label for="message">Mensagem</label>
+        <textarea name="message" id="message" cols="30" rows="10"></textarea>
+        <button type="submit">Enviar</button>
+      </form>
+    </section>
+    <script>
+      $(document).ready(function () {
+        $("form").on("submit", function (event) {
+          event.preventDefault();
+
+          const name = $("#name").val();
+          const message = $("#message").val();
+
+          if (name.length && message.length) {
+            const socket = io("localhost:3000");
+            const messageObject = {
+              name: name,
+              message: message,
+            };
+
+            socket.on("connect", function () {
+              socket.emit("sendMessage", messageObject);
+            });
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
