@@ -13,10 +13,13 @@ app.use("/", (req, res) => {
   res.render("index.html");
 });
 
+const messages = [];
+
 io.on("connection", (socket) => {
   console.log(`connected as ${socket.id}`);
   socket.on("sendMessage", (message) => {
-    console.log({ ...message });
+    messages.push({ ...message });
+    socket.emit("receivedMessage", messages);
   });
 });
 

@@ -21,25 +21,32 @@
       </form>
     </section>
     <script>
-      $(document).ready(function () {
-        $("form").on("submit", function (event) {
-          event.preventDefault();
+      function renderElement(messageObject) {
+        const { name, message } = messageObject;
+        $(".messages").append(`<div><label>${name}</label></div>`);
+      }
 
-          const name = $("#name").val();
-          const message = $("#message").val();
+      const socket = io("localhost:3000");
 
-          if (name.length && message.length) {
-            const socket = io("localhost:3000");
-            const messageObject = {
-              name: name,
-              message: message,
-            };
+      socket.on("receivedMessage", function (messages) {
+        for (const value of messages) {
+          renderElement(value);
+        }
+      });
 
-            socket.on("connect", function () {
-              socket.emit("sendMessage", messageObject);
-            });
-          }
-        });
+      $("form").submit(function (event) {
+        event.preventDefault();
+        const name = $("#name").val();
+        const message = $("#message").val();
+
+        if (name.length && message.length) {
+          const messageObject = {
+            name: name,
+            message: message,
+          };
+
+          socket.emit("sendMessage", messageObject);
+        }
       });
     </script>
   </body>
