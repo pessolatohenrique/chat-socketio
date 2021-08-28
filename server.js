@@ -16,10 +16,11 @@ app.use("/", (req, res) => {
 const messages = [];
 
 io.on("connection", (socket) => {
-  console.log(`connected as ${socket.id}`);
-  socket.on("sendMessage", (message) => {
-    messages.push({ ...message });
-    socket.emit("receivedMessage", messages);
+  socket.emit("previousMessages", messages);
+
+  socket.on("sendMessage", (data) => {
+    messages.push(data);
+    socket.broadcast.emit("receivedMessage", data);
   });
 });
 

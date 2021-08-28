@@ -11,7 +11,7 @@
   </head>
   <body>
     <section class="default-flex">
-      <form action="" method="post">
+      <form action="" method="post" id="chat-form">
         <label for="name">Nome</label>
         <input type="text" name="name" id="name" />
         <div class="messages"></div>
@@ -20,34 +20,47 @@
         <button type="submit">Enviar</button>
       </form>
     </section>
-    <script>
+    <script type="text/javascript">
       function renderElement(messageObject) {
         const { name, message } = messageObject;
-        $(".messages").append(`<div><label>${name}</label></div>`);
+        $(".messages").append(
+          `<div><strong>${name}</strong><p>${message}</p></div>`
+        );
       }
 
       const socket = io("localhost:3000");
 
-      socket.on("receivedMessage", function (messages) {
+      socket.on("receivedMessage", function (message) {
+        renderElement(message);
+      });
+
+      socket.on("previousMessages", function (messages) {
         for (const value of messages) {
           renderElement(value);
         }
       });
 
-      $("form").submit(function (event) {
+      $("#chat-form").submit(function (event) {
         event.preventDefault();
         const name = $("#name").val();
         const message = $("#message").val();
 
         if (name.length && message.length) {
           const messageObject = {
-            name: name,
-            message: message,
+            name,
+            message,
           };
 
+          renderElement(messageObject);
           socket.emit("sendMessage", messageObject);
         }
       });
+
+      // socket.on("receivedMessage", function (messages) {
+      //   for (const value of messages) {
+      //     renderElement(value);
+      //   }
+      // });
     </script>
   </body>
 </html>
